@@ -1,25 +1,49 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import DrawioEditor from './components/DrawioEditor';
+import DrawioEditorNew from './components/DrawioEditorNew';
 import './App.css';
+const App = () => {
+  const _list_drawio = [
+    {
+      id: 'editor1',
+      xml: ``,
+    },
+  ];
+  const [listDrawio, setListDrawio] = useState(_list_drawio);
+  const [test, settest] = useState({
+    test: '',
+  })
 
-function App() {
+  const callback = (id, xml) => {
+    
+    const index = listDrawio.findIndex(w => w.id === id);
+    if (index !== -1) {
+      listDrawio[index].xml = xml;
+      setListDrawio(listDrawio)
+      settest({ ...test, test: '' });
+      test.test = '';
+    }
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1 style={{ fontFamily: 'Oxanium' }}>Drawio Demo <button onClick={() => {
+        const id = listDrawio.length + 1
+        const xml = {
+          id: `editor${id}`,
+          xml: ``,
+        }
+        listDrawio.push(xml);
+        localStorage.setItem(`${xml.id}`, xml.xml);
+        setListDrawio(listDrawio)
+        settest({ ...test, test: '' });
+        test.test = '';
+      }}>เพิ่ม</button></h1>
+      {listDrawio.map((e) => (
+        <DrawioEditorNew key={e.id} id={e.id} xml={e.xml} callback={callback} />
+      ))}
+
     </div>
   );
-}
+};
 
 export default App;
