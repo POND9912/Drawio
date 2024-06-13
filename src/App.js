@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import DrawioEditorNew from './components/DrawioEditorNew';
 import './App.css';
 import { BrowserRouter, Route, Routes, Link } from 'react-router-dom';
-import Test from './test';
+
 const App = () => {
   const _list_drawio = [
     {
@@ -39,26 +39,14 @@ const App = () => {
   };
 
   return (
-    <div className="App">
-      <h1 style={{ fontFamily: 'Oxanium' }}>
+    <div className="container">
+      <h1 style={{ fontFamily: 'Oxanium', margin: '10px' }}>
         Drawio Demo
-        <button onClick={addNewDiagram}>เพิ่ม</button>
       </h1>
+      <button className="btn-add" onClick={addNewDiagram} style={{ marginBottom: '10px' }}>ADD DIAGEAMS</button>
       {listDrawio.map((e) => (
-        <DrawioEditorNew
-          key={e.id}
-          id={e.id}
-          xml={e.xml}
-          callback={callback}
-          onDelete={deleteDiagram}
-        />
+        <DrawioEditorNew key={e.id} id={e.id} xml={e.xml} callback={callback} />
       ))}
-      <BrowserRouter>
-        <Link to="test" >test</Link>
-        <Routes>
-          <Route path='/test' element={<Test />} />
-        </Routes>
-      </BrowserRouter>
     </div>
   );
 };
