@@ -45,7 +45,7 @@ const App = () => {
       </h1>
       <button className="btn-add" onClick={addNewDiagram} style={{ marginBottom: '10px' }}>ADD DIAGEAMS</button>
       {listDrawio.map((e) => (
-        <DrawioEditorNew key={e.id} id={e.id} xml={e.xml} callback={callback} />
+        <DrawioEditorNew key={e.id} id={e.id} xml={e.xml} callback={callback} onDelete={deleteDiagram} />
       ))}
     </div>
   );
