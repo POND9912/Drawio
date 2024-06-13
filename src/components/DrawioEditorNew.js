@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './DrawioEditor.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faDownload, faFileImage } from '@fortawesome/free-solid-svg-icons';
 import { saveAs } from 'file-saver';
 import mxgraph from 'mxgraph';
 
-const { mxClient, mxGraph, mxCodec, mxUtils } = mxgraph();
+const { mxClient, mxGraph, mxCodec, mxUtils, mxSvgCanvas2D, mxRectangle } = mxgraph();
 
 const DrawioEditorNew = ({ id, xml, callback, onDelete }) => {
     const [drawioTab, setDrawioTab] = useState(null);
+    const imageRef = useRef(null);
 
     useEffect(() => {
         const onMessage = (event) => {
@@ -37,6 +38,12 @@ const DrawioEditorNew = ({ id, xml, callback, onDelete }) => {
         };
     }, [drawioTab, callback, id]);
 
+    useEffect(() => {
+        if (xml) {
+            renderImageFromXML(xml);
+        }
+    }, [xml]);
+
     const openDrawio = () => {
         const tab = window.open(`https://embed.diagrams.net/?embed=1&proto=json&editorId=${id}`, '_blank');
         setDrawioTab(tab);
@@ -47,58 +54,71 @@ const DrawioEditorNew = ({ id, xml, callback, onDelete }) => {
         setTimeout(sendLoadMessage, 2000);
     };
 
-    const downloadXML = () => {
-        const element = document.createElement('a');
-        const file = new Blob([xml], { type: 'text/xml' });
-        element.href = URL.createObjectURL(file);
-        element.download = `${id}.xml`;
-        document.body.appendChild(element); // Required for this to work in FireFox
-        element.click();
-    };
-
-    const downloadJPG = () => {
-        if (!mxClient || !mxClient.isBrowserSupported()) {
-            console.error('mxGraph library is not loaded or browser is not supported');
+    const renderImageFromXML = (xml) => {
+        if (!mxClient.isBrowserSupported()) {
+            console.error('Browser is not supported!');
             return;
         }
 
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(xml, 'text/xml');
-
         const container = document.createElement('div');
-        container.style.position = 'absolute';
-        container.style.overflow = 'hidden';
-        container.style.width = '1px';
-        container.style.height = '1px';
+        container.style.visibility = 'hidden';
         document.body.appendChild(container);
 
         const graph = new mxGraph(container);
-        const decoder = new mxCodec(doc);
-        const model = graph.getModel();
-        decoder.decode(doc.documentElement, model);
+        const doc = mxUtils.parseXml(xml);
+        const codec = new mxCodec(doc);
+        codec.decode(doc.documentElement, graph.getModel());
 
-        const svgRoot = container.querySelector('svg');
-        if (!svgRoot) {
-            console.error('SVG element not found in the provided XML');
-            document.body.removeChild(container);
-            return;
+        const bounds = graph.getGraphBounds();
+        const svgCanvas = new mxSvgCanvas2D(document.createElement('svg'));
+        svgCanvas.translate = true;
+        svgCanvas.scale(1);
+
+        const svgRoot = svgCanvas.root;
+        svgRoot.setAttribute('width', Math.ceil(bounds.x + bounds.width));
+        svgRoot.setAttribute('height', Math.ceil(bounds.y + bounds.height));
+        svgRoot.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+        const background = svgRoot.ownerDocument.createElementNS(svgRoot.namespaceURI, 'rect');
+        background.setAttribute('width', '100%');
+        background.setAttribute('height', '100%');
+        background.setAttribute('fill', 'white');
+        svgRoot.appendChild(background);
+
+        const xmlCanvas = new mxSvgCanvas2D(svgRoot);
+        const graphModel = graph.getModel();
+
+        graphModel.beginUpdate();
+        try {
+            const cells = graphModel.cells;
+            for (const id in cells) {
+                const cell = cells[id];
+                if (graphModel.isVertex(cell)) {
+                    const state = graph.view.getState(cell);
+                    if (state) {
+                        graph.cellRenderer.paintVertexShape(xmlCanvas, state);
+                    }
+                } else if (graphModel.isEdge(cell)) {
+                    const state = graph.view.getState(cell);
+                    if (state) {
+                        graph.cellRenderer.paintEdgeShape(xmlCanvas, state);
+                    }
+                }
+            }
+        } finally {
+            graphModel.endUpdate();
         }
 
-        const svgString = new XMLSerializer().serializeToString(svgRoot);
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        const img = new Image();
+        const serializer = new XMLSerializer();
+        const svgString = serializer.serializeToString(svgRoot);
+        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
 
-        img.onload = () => {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            context.drawImage(img, 0, 0);
-            canvas.toBlob((blob) => {
-                saveAs(blob, `${id}.jpg`);
-                document.body.removeChild(container);
-            }, 'image/jpeg');
-        };
-        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+        if (imageRef.current) {
+            imageRef.current.src = url;
+        }
+
+        document.body.removeChild(container);
     };
 
     return (
@@ -118,6 +138,7 @@ const DrawioEditorNew = ({ id, xml, callback, onDelete }) => {
                     <FontAwesomeIcon icon={faTrash} />
                 </button>
             </div>
+            <img ref={imageRef} src="" alt="Diagram" />
         </div>
     );
 };
