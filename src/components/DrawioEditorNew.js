@@ -56,7 +56,7 @@ const DrawioEditorNew = ({ id, xml, callback, callbackClick }) => {
     };
 
     return (
-        <div className="drawio-container" style={{ margin: 0 }}>
+        <div className="drawio-container" style={{ margin: '10px' }}>
             <p>Diagrams {id}</p>
             <button className="btn-upload" onClick={openDrawio}>
                 <FontAwesomeIcon icon={faEdit} />
