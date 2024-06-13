@@ -3,11 +3,12 @@
     /* justify-content: center; */
     margin: 0;
     width: 50%;
-    border: 2px solid black;
+    border: 2px solid rgb(93, 93, 93);
+    /* border-radius: 10px; */
     /* display: inline-block; */
 }
 
-.btn-upload {
+.btn-upload,.btn-download,.btn-delete {
     display: flex;
     align-items: center;
     justify-content: center;
