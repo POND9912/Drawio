@@ -5,43 +5,48 @@ import './App.css';
 const App = () => {
   const _list_drawio = [
     {
-      id: 'editor1',
+      id: '1',
       xml: ``,
     },
   ];
   const [listDrawio, setListDrawio] = useState(_list_drawio);
+
   const [test, settest] = useState({
     test: '',
   })
 
   const callback = (id, xml) => {
-    
     const index = listDrawio.findIndex(w => w.id === id);
     if (index !== -1) {
-      listDrawio[index].xml = xml;
-      setListDrawio(listDrawio)
-      settest({ ...test, test: '' });
-      test.test = '';
+      const updatedList = listDrawio.map((item, i) =>
+        i === index ? { ...item, xml } : item
+      );
+      setListDrawio(updatedList);
     }
-  }
+  };
+
+  const addNewDiagram = () => {
+    const id = listDrawio.length + 1;
+    const newDiagram = {
+      id: `${id}`,
+      xml: ``,
+    };
+    const updatedList = [...listDrawio, newDiagram];
+    localStorage.setItem(`${newDiagram.id}`, newDiagram.xml);
+    setListDrawio(updatedList);
+  };
+
   return (
     <div className="App">
-      <h1 style={{ fontFamily: 'Oxanium' }}>Drawio Demo <button onClick={() => {
-        const id = listDrawio.length + 1
-        const xml = {
-          id: `editor${id}`,
-          xml: ``,
-        }
-        listDrawio.push(xml);
-        localStorage.setItem(`${xml.id}`, xml.xml);
-        setListDrawio(listDrawio)
-        settest({ ...test, test: '' });
-        test.test = '';
-      }}>เพิ่ม</button></h1>
-      {listDrawio.map((e) => (
-        <DrawioEditorNew key={e.id} id={e.id} xml={e.xml} callback={callback} />
-      ))}
-
+      <div className="container">
+        <h1 style={{ fontFamily: 'Oxanium', margin: '10px' }}>
+          Drawio Demo
+        </h1>
+        <button className="btn-add" onClick={addNewDiagram} style={{ marginBottom: '10px' }}>ADD DIAGEAMS</button>
+        {listDrawio.map((e) => (
+          <DrawioEditorNew key={e.id} id={e.id} xml={e.xml} callback={callback} />
+        ))}
+      </div>
     </div>
   );
 };

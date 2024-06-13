@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './DrawioEditor.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit } from '@fortawesome/free-solid-svg-icons'; // นำเข้าไอคอนที่ต้องการ
 
 const DrawioEditorNew = ({ id, xml, callback, callbackClick }) => {
     const [drawioTab, setDrawioTab] = useState(null);
@@ -8,7 +10,7 @@ const DrawioEditorNew = ({ id, xml, callback, callbackClick }) => {
             if (event.origin !== 'https://embed.diagrams.net') return;
             if (event.data.length > 0 && event.data.substring(0, 1) === '{') {
                 const msg = JSON.parse(event.data);
-          
+
                 // 
                 if (msg.event === 'save') {
                     const xml = msg.xml;
@@ -54,8 +56,11 @@ const DrawioEditorNew = ({ id, xml, callback, callbackClick }) => {
     };
 
     return (
-        <div className="drawio-container">
-            <button onClick={openDrawio}>Open {id}</button>
+        <div className="drawio-container" style={{ margin: 0 }}>
+            <p>Diagrams {id}</p>
+            <button className="btn-upload" onClick={openDrawio}>
+                <FontAwesomeIcon icon={faEdit} />
+            </button>
         </div>
     );
 };
