@@ -7,7 +7,7 @@ import mxgraph from 'mxgraph';
 
 const { mxClient, mxGraph, mxCodec, mxUtils, mxSvgCanvas2D, mxRectangle } = mxgraph();
 
-const DrawioEditorNew = ({ id, xml, callback, onDelete }) => {
+const DrawioEditorNew = ({ id, name, xml, callback, onDelete }) => {
     const [drawioTab, setDrawioTab] = useState(null);
     const imageRef = useRef(null);
 
@@ -123,7 +123,7 @@ const DrawioEditorNew = ({ id, xml, callback, onDelete }) => {
 
     return (
         <div className="drawio-container" style={{ margin: '10px' }}>
-            <p>Diagrams {id}</p>
+            <p>{name}</p>
             <div style={{ display: 'flex' }}>
                 <button className="btn-upload" onClick={openDrawio}>
                     <FontAwesomeIcon icon={faEdit} />
@@ -138,7 +138,7 @@ const DrawioEditorNew = ({ id, xml, callback, onDelete }) => {
                     <FontAwesomeIcon icon={faTrash} />
                 </button>
             </div>
-            <img ref={imageRef} src="" alt="Diagram" />
+            {/* <img ref={imageRef} src="" alt="Diagram" /> */}
         </div>
     );
 };
