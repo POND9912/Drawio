@@ -144,7 +144,7 @@ const DrawioEditorNew = ({ id, name, xml, jpg, callback, onDelete }) => {
           <FontAwesomeIcon icon={faTrash} />
         </button>
       </div>
-      {imageSrc && (
+      {imageSrc && jpg !== "" && (
         <div
           className="drawio-image-container"
           onWheel={handleWheel}
@@ -158,7 +158,7 @@ const DrawioEditorNew = ({ id, name, xml, jpg, callback, onDelete }) => {
         >
           <img
             ref={imageRef}
-            src={imageSrc}
+            src={jpg}
             alt="Diagram"
             style={{
               transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
