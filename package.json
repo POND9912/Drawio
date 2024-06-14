@@ -14,11 +14,13 @@
     "drawio": "^1.0.7",
     "file-saver": "^2.0.5",
     "mxgraph": "^4.2.2",
+    "puppeteer": "^0.12.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-drawio": "^0.1.8",
     "react-router-dom": "^6.23.1",
     "react-scripts": "5.0.1",
+    "react-xml-parser": "^1.1.8",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -44,5 +46,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "proxy": "https://exp.draw.io"
 }
